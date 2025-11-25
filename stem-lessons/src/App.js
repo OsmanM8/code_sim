@@ -97,33 +97,43 @@ export default function App() {
   const [output, setOutput] = useState("");
 
   const runCode = async () => {
-    setOutput("Running...");
-    try {
-      const res = await fetch("https://codesim-gcpb.onrender.com/", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          lesson_id: selectedLesson,
-          code: code,
-        }),
-      });
+  setOutput("Running...");
 
-      const data = await res.json();
-      console.log(data);
+  try {
+    const res = await fetch("https://codesim-gcpb.onrender.com/validate", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        lesson_id: selectedLesson,
+        code: code,
+      }),
+    });
 
-      if (data && data.feedback) {
-        setOutput(
-          data.success
-            ? `✔ Passed\n\nOutput:\n${data.output}`
-            : `✘ Failed\n\nFeedback:\n${data.feedback}\n\nYour Output:\n${data.your_output}`
-        );
-      } else {
-        setOutput("Unexpected response from server.");
-      }
-    } catch (err) {
-      setOutput("Error contacting server.");
+    const data = await res.json();
+    console.log("SERVER RESPONSE:", data);
+
+    // Handle backend errors
+    if (!data || typeof data.success === "undefined") {
+      setOutput("Unexpected response from server.");
+      return;
     }
-  };
+
+    // SUCCESS CASE
+    if (data.success) {
+      setOutput(`✔ Passed\n\nOutput:\n${data.output}`);
+      return;
+    }
+
+    // FAIL CASE
+    setOutput(
+      `✘ Failed\n\nFeedback:\n${data.feedback}\n\nYour Output:\n${data.your_output}`
+    );
+
+  } catch (err) {
+    console.error(err);
+    setOutput("Error contacting server.");
+  }
+};
 
   const particlesInit = useCallback(async (engine) => {
   await loadSlim(engine);

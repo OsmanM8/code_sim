@@ -19,7 +19,7 @@ app = FastAPI()
 # CORS - UPDATE THIS for production
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],  # Changed from localhost:3000 to *
+    allow_origins=["https://codesim-front.onrender.com"],  # Changed from localhost:3000 to *
     allow_methods=["*"],
     allow_headers=["*"],
 )

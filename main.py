@@ -1,9 +1,6 @@
 from fastapi import FastAPI, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
-from fastapi.staticfiles import StaticFiles
-from fastapi.responses import FileResponse
-import os
 
 # Import validators
 from lesson_validators import (
@@ -23,29 +20,16 @@ app = FastAPI()
 # CORS
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],  # Changed from localhost:3000 to * for now
+    allow_origins=["http://localhost:3000"],
     allow_methods=["*"],
     allow_headers=["*"],
 )
-
-# Serve static files from the stem-lessons build directory
-app.mount("/static", StaticFiles(directory="stem-lessons/build/static"), name="static")
-
-@app.get("/")
-async def serve_frontend():
-    return FileResponse("stem-lessons/build/index.html")
-
-@app.get("/{full_path:path}")
-async def catch_all(full_path: str):
-    # Serve index.html for all React Router routes
-    if not full_path.startswith("api") and "." not in full_path:
-        return FileResponse("stem-lessons/build/index.html")
-    raise HTTPException(status_code=404, detail="Not found")
 
 # Request schema
 class CodeRequest(BaseModel):
     lesson_id: str
     code: str
+
 
 # Expected outputs (from your existing dict)
 lesson_expected_output = {
@@ -100,6 +84,12 @@ async def validate_lesson(req: CodeRequest):
 
     return {
         "success": ok,
+        "feedback": feedback,
+        "output": final_output,
+        "your_output": final_output,
+    }
+
+
         "feedback": feedback,
         "output": final_output,
         "your_output": final_output,

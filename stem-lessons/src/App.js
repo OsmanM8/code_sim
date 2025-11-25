@@ -99,7 +99,7 @@ export default function App() {
   const runCode = async () => {
     setOutput("Running...");
     try {
-      const res = await fetch("http://127.0.0.1:8000/validate", {
+      const res = await fetch("http://https://codesim-gcpb.onrender.com/validate", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({

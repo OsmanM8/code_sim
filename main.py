@@ -1,6 +1,23 @@
 from fastapi import FastAPI, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
+from fastapi.staticfiles import StaticFiles
+from fastapi.responses import FileResponse
+import os
+
+# Serve static files from the stem-lessons build directory
+app.mount("/static", StaticFiles(directory="stem-lessons/build/static"), name="static")
+
+@app.get("/")
+async def serve_frontend():
+    return FileResponse("stem-lessons/build/index.html")
+
+@app.get("/{full_path:path}")
+async def catch_all(full_path: str):
+    # Serve index.html for all React Router routes
+    if not full_path.startswith("api") and "." not in full_path:
+        return FileResponse("stem-lessons/build/index.html")
+    raise HTTPException(status_code=404, detail="Not found")
 
 # Import validators
 from lesson_validators import (
